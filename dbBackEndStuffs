@@ -1,0 +1,3 @@
+Database prototype
+
+[Index] | "Task" | Compleated (bool) | DoneDate (date)
