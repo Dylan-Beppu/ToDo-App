@@ -1,96 +1,53 @@
-import React, {useState} from 'react';
-import { StatusBar } from 'expo-status-bar';
-import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, FlatList, View } from 'react-native';
+import React, {useState, useRef, useEffect} from 'react';
+
+import { StatusBar, TouchableWithoutFeedback } from 'react-native';
+import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, Modal,Pressable, SafeAreaView, TouchableOpacity, FlatList, View, Alert } from 'react-native';
+// import AndroidSystemBars from 'react-native-system-bars';
 import * as DataBase from './dataBase.js';
 // import "react-native-gesture-handler";
-
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Task from './components/Task'
-import Ttest from './components/ClassTest';
 
 
-
-
-
-// let TestData = [
-//   {}
-// ]
-
-
-
-// function addElements(n) {
-//   const startKey = testData2.length + 1;
-//   for (let i = 0; i < n; i++) {
-//     // console.log(`Task ${startKey + i}`)
-//     testData2.push({
-//       Key: startKey + i,
-//       Task: `Task ${startKey + i}`,
-//       Done: false,
-//       date: null,
-//     });
-//   }
-// }
-
-// addElements(40);
-
-
-
-// async function LoadTodos(){
-//   try{
-
-//   }
-// }
-
-
-
+// AndroidSystemBars.hideNavigationBar();
 
 export  default function App() {
   const [task, setTask] = useState();
-  const [taskItems, setTaskItems] = useState([]);
-  const [testData, setTestData] = useState([]);
-
-  const [todoTab, setTodos] = useState([]);
-  
+  const [todoTab, setTodo] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
   React.useEffect(() => {
     DataBase.dbLoader();
   }, []);
   
  
-
-  const  handleAddTask = () => {
-    Keyboard.dismiss();
-    setTaskItems([...taskItems, task]);
-
-    setTask(null);
-
-  }
-
-  const completeTask = (index) => {
-    let itemsCopy = [...taskItems];
-    itemsCopy.splice(index,1);
-    setTaskItems(itemsCopy);
-  }
-  
+ 
   async function AddItem() {
     Keyboard.dismiss();
-    await DataBase.addTodo(task);
-    InitList();
-    setTask(null);
+    setModalVisible(false);
+    try {
+      await DataBase.addTodo(task);
+      InitList();
+      setTask(null);
+    } catch (e) {
+      Alert.alert('ToDoApp', 'Unable to add blank todo', [
+        {text: 'OK'},
+      ]);
+    }
+    
   }
 
   async function InitList() {
-    const tab = await DataBase.GetTodos();
-    setTodos(tab);
+    const tab = await DataBase.GetTodo();
+    setTodo(tab);
   }
 
   async function ReloadList() {
-    console.log("I Shuld be reloading")
     await InitList();
   }
 
-
-  // const RemoveLastItem = () => {
-  //   setTestData(testData2.pop())
-  // }
+  async function  openAndFocus(){
+    setModalVisible(true);
+  }
 
 
 
@@ -100,63 +57,83 @@ export  default function App() {
 
 
 
+  return (    
+    // using safe area to not collide with everything
+    <SafeAreaView style={styles.container}>
 
-  return (
-    <View style={styles.container}>
+
+<Modal
+  animationType="slide"
+  transparent={true}
+  visible={modalVisible}
+  onRequestClose={() => {
+    Keyboard.dismiss();
+
+    setModalVisible(!modalVisible);
+  }}
+>
+  <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{flex: 1, justifyContent: 'flex-end'}}>
+    <View style={styles.modalView}>
+      <TouchableWithoutFeedback>
+      <TextInput style={styles.input}  autoFocus={true} placeholder={'write a task'} value={task} onChangeText={text => setTask(text)}/>
+      </TouchableWithoutFeedback>
+      <TouchableOpacity onPress={() => AddItem()}>
+        <View style={styles.addWrapper}>
+          <Text style={styles.addText}>+</Text>
+        </View>
+      </TouchableOpacity>
+    </View>
+  </KeyboardAvoidingView>
+</Modal>
+
+
      <View style={styles.tasksWrapper}>
+      <View style={styles.CenterTop}>
       <Text style={styles.sectionTitle}>Today's tasks</Text>
-
+      <TouchableOpacity onPress={() => openAndFocus()}>
+          {/* <View style={styles.addWrapper}> */}
+            <Text style={{color: '#548aa3'}}>New Task</Text>
+          {/* </View> */}
+        </TouchableOpacity>
+      </View>
+    
 
       {/* Changed to flat list as to be way more efficent with the loading */}
       <FlatList
         data={todoTab}
-        renderItem={({item}) => <Task text={item.Task} id={item.Key} isCompleate={item.Done} ReloadList={() => ReloadList()} fun/>}
+        renderItem={({item}) => <Task text={item.Task} id={item.Key} isCompleate={item.IsDone} ReloadList={() => ReloadList()} fun/>}
         keyExtractor={item => item.Key}
       />
      </View>
-
-     {/* Write a task view */}
-     <KeyboardAvoidingView
-        behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.writeTaskWrapper}
-      >
-        <TextInput style={styles.input} placeholder={'write a task'} value={task} onChangeText={text => setTask(text)}/>
-        
-        <TouchableOpacity onPress={() => AddItem()}>
-          <View style={styles.addWrapper}>
-            <Text style={styles.addText}>+</Text>
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => DataBase.logDat()}>
-          <View style={styles.addWrapper}>
-            <Text style={styles.addText}>T</Text>
-          </View>
-        </TouchableOpacity>
-      </KeyboardAvoidingView>
-
-      <StatusBar style="auto" />
-    </View>
+      <StatusBar backgroundColor="#E8EAED" barStyle="dark-content" />
+    </SafeAreaView>
   );
 }
 
 // TODO: Move to its own file
 const styles = StyleSheet.create({
+
   container: {
     flex: 1,
+    flexDirection: 'column',
     backgroundColor: '#E8EAED',
-    // paddingTop: 0,
-    // marginTop: 40,
   },
   tasksWrapper: {
-    
-    // backgroundColor: '#444444',
-    paddingTop: 30,
-    paddingHorizontal: 20,
-    paddingBottom: 110,
+    flex:1,
   },
   sectionTitle: {
-    fontSize: 24,
-    fontWeight: 'bold'
+    fontSize: 30,
+    fontWeight: 'bold',
+    // paddingBottom: 15,
+    // paddingLeft: 20,
+  },
+  CenterTop: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingLeft: 20,
+    paddingRight: 20,
+    paddingBottom: 10,
   },
   items: {
     marginTop: 30,
@@ -172,21 +149,37 @@ const styles = StyleSheet.create({
   input: {
     paddingVertical: 15,
     paddingHorizontal: 15,
-    backgroundColor: '#FFF',
-    borderRadius: 60,
-    borderColor: '#C0C0C0',
-    borderWidth: 1,
-    width: 250,
+    width: '85%'
   },
   addWrapper: {
-    width: 60,
-    height: 60,
+    padding: 10,
+    width: 50,
+    height: 50,
     backgroundColor: '#FFF',
     borderRadius: 60,
     justifyContent: 'center',
     alignItems: 'center',
     borderColor: '#C0C0C0',
     borderWidth: 1,
+    fontSize: 50,
   },
-  addText: {},
+  modalView: {
+    marginBottom: 0,
+    borderBottomEndRadius: 0,
+    borderBottomStartRadius: 0,
+
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingRight: 5,
+    borderWidth: 1,
+    borderColor: '#C0C0C0',
+    height: 60,
+    shadowColor: '#212b35',
+    shadowOpacity: 0.5,
+    shadowRadius: 50,
+    elevation: 5,
+  },
 });
