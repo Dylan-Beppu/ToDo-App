@@ -1,12 +1,30 @@
 import { StyleSheet } from "react-native";
 
-export const GlobalColors = [
-    Bacgground 
-]
+
+//Using xx2 for dark mode (if it happens (follow system theam))
+export const GlobalColors = {
+    Background: '#Hex',
+    Background2: '#Hex',
+    Foreground: '#Hex',
+    Foreground2: '#Hex',
+    Accent: '#Hex',
+    Accent2: '#Hex',
+}
+
+
 
 
 
 export const GlobalStyle = StyleSheet.create({
+    Title: {
+        fontSize: 30,
+        fontWeight: 'bold',
+        // fontFamily: ''
+    },
+    textBtn: {
+        color: GlobalColors.Accent,
+        fontFamily: ''
+    },
 
 
 

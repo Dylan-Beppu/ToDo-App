@@ -34,7 +34,7 @@ export async function dbLoader() {
 }
 
 /**
- * close the database
+ * closes the database
  */
 export function dbEnd() {
   if (DB != null) {
@@ -46,7 +46,7 @@ export function dbEnd() {
 
 // return testData2;
 
-//TestDb functions (So things will change, but for now will olny use the table to make stuffs)
+// TestDb functions (So things will change, but for now will olny use the table to make stuffs)
 export async function GetTodo() {
   let rtnArr = [];
   let sqlCmd = "SELECT * FROM Storage";
@@ -88,9 +88,20 @@ export function logDat() {
   });
 }
 
+/**
+ * Adds a new todo task to a database. 
+ * If the task is an empty string, it rejects the operation.
+ * @param {string} task todo string 
+ */
 export async function addTodo(task) {
   await new Promise((resolve, reject) => {
     let sqlCmd = "INSERT INTO Storage (Task) VALUES (?)";
+
+    //Handles empty string, transaction only errors on null string
+    if(task === "") {
+      reject("Empty string");
+    }
+
     DB.transaction((tx) => {
       tx.executeSql(
         sqlCmd,

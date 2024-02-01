@@ -1,15 +1,13 @@
 import React, {useState, useRef, useEffect} from 'react';
 
-import { StatusBar, TouchableWithoutFeedback } from 'react-native';
-import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, Modal,Pressable, SafeAreaView, TouchableOpacity, FlatList, View, Alert } from 'react-native';
-// import AndroidSystemBars from 'react-native-system-bars';
+import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, Modal, Pressable, SafeAreaView, TouchableOpacity, FlatList, View, Alert, StatusBar, TouchableWithoutFeedback } from 'react-native';
+
+
 import * as DataBase from './dataBase.js';
-// import "react-native-gesture-handler";
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import Task from './components/Task'
 
 
-// AndroidSystemBars.hideNavigationBar();
+
 
 export  default function App() {
   const [task, setTask] = useState();
@@ -21,9 +19,14 @@ export  default function App() {
   
  
  
+  /**
+   * Adds the item
+   */
   async function AddItem() {
     Keyboard.dismiss();
     setModalVisible(false);
+
+    //Attempt to add the task, and gives user error when it happens
     try {
       await DataBase.addTodo(task);
       InitList();
@@ -111,6 +114,7 @@ export  default function App() {
 }
 
 // TODO: Move to its own file
+//Keeping positional stuff here as most is unique to each page layout
 const styles = StyleSheet.create({
 
   container: {
@@ -124,8 +128,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 30,
     fontWeight: 'bold',
-    // paddingBottom: 15,
-    // paddingLeft: 20,
   },
   CenterTop: {
     flexDirection: 'row',
