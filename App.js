@@ -5,6 +5,7 @@ import { Keyboard, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, 
 
 import * as DataBase from './dataBase.js';
 import Task from './components/Task'
+import {GlobalStyle, GlobalColors} from './assets/GlobalStyles/GlobalStyle.js'
 
 
 
@@ -88,7 +89,7 @@ export  default function App() {
     </View>
   </KeyboardAvoidingView>
 </Modal>
-
+  {/* {task} */}
 
      <View style={styles.tasksWrapper}>
       <View style={styles.CenterTop}>
@@ -104,7 +105,7 @@ export  default function App() {
       {/* Changed to flat list as to be way more efficent with the loading */}
       <FlatList
         data={todoTab}
-        renderItem={({item}) => <Task text={item.Task} id={item.Key} isCompleate={item.IsDone} ReloadList={() => ReloadList()} fun/>}
+        renderItem={({item}) => <Task text={item.Task} id={item.Key} isCompleate={item.IsDone} ReloadList={() => ReloadList()}></Task>}
         keyExtractor={item => item.Key}
       />
      </View>
@@ -120,7 +121,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: '#E8EAED',
+    backgroundColor: GlobalColors.Background,
   },
   tasksWrapper: {
     flex:1,

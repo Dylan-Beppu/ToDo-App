@@ -3,7 +3,7 @@ import { StyleSheet } from "react-native";
 
 //Using xx2 for dark mode (if it happens (follow system theam))
 export const GlobalColors = {
-    Background: '#Hex',
+    Background: '#E8EAED',
     Background2: '#Hex',
     Foreground: '#Hex',
     Foreground2: '#Hex',
@@ -28,4 +28,4 @@ export const GlobalStyle = StyleSheet.create({
 
 
 
-})
+});

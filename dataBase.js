@@ -3,6 +3,7 @@ import * as SQLite from "expo-sqlite";
 // import { Asset } from "expo-asset";
 
 let DB = SQLite.openDatabase("./todoStor.db");
+// let DB = SQLite.openDatabase("./neoStore.db");
 
 const STORAGE_STR = `
 CREATE TABLE IF NOT EXISTS Storage (
@@ -50,13 +51,14 @@ export function dbEnd() {
 export async function GetTodo() {
   let rtnArr = [];
   let sqlCmd = "SELECT * FROM Storage";
-  console.log("Sending back data");
+  // console.log("Sending back data");
   await new Promise((resolve, reject) => {
     DB.transaction((tx) => {
       tx.executeSql(
         sqlCmd,
         [],
         (_, { rows }) => {
+          // console.log(rows._array)
           rtnArr = rows._array;
           resolve();
         },
